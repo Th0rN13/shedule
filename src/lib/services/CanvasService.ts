@@ -17,27 +17,38 @@ export interface TextConfig {
     fill: HexColor;
     align: CanvasTextAlign;
     verticalAlign: CanvasTextBaseline;
+    wrap?: string;
+    ellipsis: boolean;
     rotation?: number;
     shadowColor?: string;
     shadowBlur?: number;
     shadowOpacity?: number;
+    shadowEnabled?: boolean,
 }
+
+
+export const defaultTextConfig: TextConfig = {
+    text: "",
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    align: 'left',
+    verticalAlign: 'top',
+    fontSize: 30,
+    fontFamily: 'Gilroy-Bold',
+    fill: "#000000",
+    shadowColor: 'white',
+    shadowBlur: 10,
+    shadowOpacity: 1,
+    shadowEnabled: true,
+    wrap: 'none',
+    ellipsis: true
+};
 
 export class CanvasService {
     static createTextConfig(options: Partial<TextConfig>): TextConfig {
-        return {
-            text: '',
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
-            fontSize: 12,
-            fontFamily: 'Arial',
-            fill: '#000000',
-            align: 'left',
-            verticalAlign: 'top',
-            ...options
-        }
+        return defaultTextConfig
     }
 
     static calculatePosition(index: number, isSmall: boolean): Position {
@@ -48,18 +59,6 @@ export class CanvasService {
     }
 
     static generateTextConfigs(data: ScheduleItem, isSmall: boolean): TextConfig {
-        return {
-            text: '',
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
-            fontSize: 12,
-            fontFamily: 'Arial',
-            fill: '#000000',
-            align: 'left',
-            verticalAlign: 'top',
-
-        }
+        return defaultTextConfig
     }
 }
