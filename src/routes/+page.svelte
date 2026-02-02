@@ -1,9 +1,15 @@
 <script lang="ts">
-	import { Stage, Layer, Image, Text } from 'svelte-konva';
+	import background from '$lib/sapa_bg.png';
+	import font from '$lib/Gilroy-Bold.woff';
+	import { Stage, Layer, Image, Text, Transformer } from 'svelte-konva';
 	import RangeSlider from 'svelte-range-slider-pips';
 
 	let viewCanvas = $state(true);
 	let viewGrid = $state(false);
+	let stage: Stage | undefined = $state();
+	let stageSmall: Stage | undefined = $state();
+	let image: HTMLImageElement | undefined = $state(undefined);
+	let imageSmall: HTMLImageElement | undefined = $state(undefined);
 
 	$effect(() => {
 		viewGrid = viewCanvas;
@@ -36,7 +42,7 @@
 				textColor: raw?.textColor ?? '#000000'
 			};
 		} catch (e) {
-			console.log('Error parsing old data');
+			console.warn('Error parsing old data');
 		}
 		return result;
 	}
@@ -114,14 +120,10 @@
 		viewGrid = !viewGrid;
 	}
 
-	const bgImg = '/sapa_bg.png';
-	let image: HTMLImageElement | undefined = $state(undefined);
-	let imageSmall: HTMLImageElement | undefined = $state(undefined);
-
 	$effect(() => {
-		console.log('dt', daysText);
 		localStorage.shedule = JSON.stringify({
 			daysText,
+			daysToggle,
 			centerOffset,
 			color: textColor
 		});
@@ -129,7 +131,7 @@
 
 	$effect(() => {
 		const img = document.createElement('img');
-		img.src = bgImg;
+		img.src = background;
 		img.crossOrigin = 'Anonymous';
 		img.onload = () => {
 			image = img;
@@ -182,6 +184,19 @@
 		verticalAlign: 'middle'
 	});
 
+	const dayOffTextConfig = $derived({
+		...defaultTextConfig,
+		text: 'ВЫХОДНОЙ',
+		fontSize: 56,
+		x: 600,
+		y: 200,
+		height: titleLineHeight,
+		width: columnWidth,
+		align: 'center',
+		rotation: 20,
+		verticalAlign: 'middle'
+	});
+
 	const titleSmallTextConfig = $derived({
 		...defaultTextConfig,
 		text: 'Расписание',
@@ -203,6 +218,17 @@
 		width: totalWidth - rightBorderWidth,
 		align: 'left',
 		verticalAlign: 'bottom'
+	});
+
+	function* chunks(arr: Array<any>, n: number) {
+		for (let i = 0; i < arr.length; i += n) {
+			yield arr.slice(i, i + n);
+		}
+	}
+
+	const daysOff = $derived.by(() => {
+		let result = [...chunks(daysToggle, 2)].map((day) => day.every((stream) => !stream));
+		return result;
 	});
 
 	const constantTextConfigs = $derived(
@@ -260,12 +286,44 @@
 		})
 	);
 
+	const dayOfftextConfigs = $derived(
+		daysOff
+			.map((el, idx) => {
+				let x = columngGap - 40;
+				if (idx >= 3) {
+					x += columnWidth + columngGap;
+				}
+				if (idx >= 6) {
+					x = columngGap + centerOffset;
+				}
+				let y = titleLineHeight;
+				if (idx >= 6) {
+					// y = titleLineHeight + textLineHeight * (10 + idx - 6);
+					y = titleLineHeight + (3 * 3 + 2) * textLineHeight;
+				} else {
+					y = titleLineHeight + ((idx % 3) * 3 + 1) * textLineHeight;
+				}
+				return {
+					...defaultTextConfig,
+					fill: textColor,
+					text: el ? '✨ ВЫХОДНОЙ' : '',
+					fontSize: 50,
+					align: 'center',
+					verticalAlign: 'middle',
+					height: textLineHeight * 2 + 30,
+					width: idx >= 6 ? columnWidth * 2 + columngGap : columnWidth,
+					x,
+					y
+				};
+			})
+			.filter((el) => el.text !== '')
+	);
+
 	const smallTextConfigsConst = $derived.by(() => {
 		let texts = smallAddText.map((e) => e).filter((_, idx) => daysToggle[idx]);
 		return texts.map((el, idx) => {
 			let x = 20;
 			let y = 100 + idx * smallLineHeight;
-			console.log(idx, y, el);
 			return {
 				...defaultTextConfig,
 				fontSize: 22,
@@ -298,15 +356,8 @@
 		});
 	});
 
-	$effect(() => {
-		console.log(smallTextConfigsConst);
-	});
-
-	let layer: Stage = $state();
-	let layerSmall: Stage = $state();
-
 	function download() {
-		layer!.toDataURL({
+		stage!.node.toDataURL({
 			callback(img: string) {
 				let downloadLink = document.createElement('a');
 				let url = img.replace(/^data:image\/png/, 'data:application/octet-stream');
@@ -320,7 +371,7 @@
 	}
 
 	function downloadSmall() {
-		layerSmall!.toDataURL({
+		stageSmall!.node.toDataURL({
 			callback(img: string) {
 				let downloadLink = document.createElement('a');
 				let url = img.replace(/^data:image\/png/, 'data:application/octet-stream');
@@ -343,9 +394,9 @@
 
 <div>
 	{#each daysName as name, idx}
-		<label>
+		<label class="row">
 			<span>{name}</span>
-
+			<input type="text" bind:value={daysText[idx]} />
 			<button onclick={() => (daysToggle[idx] = !daysToggle[idx])}>
 				{#if daysToggle[idx]}
 					✅
@@ -353,7 +404,7 @@
 					❌
 				{/if}
 			</button>
-			<input type="text" bind:value={daysText[idx]} />
+
 			<button onclick={() => (daysText[idx] = '')}> 🗑️ </button>
 		</label>
 	{/each}
@@ -371,18 +422,21 @@
 
 {#if viewCanvas}
 	<div class="wrap">
-		<Stage config={{ width: 1920, height: 1080 }} bind:handle={layer}>
+		<Stage width={totalWidth} height={totalHeight} bind:this={stage}>
 			<Layer>
-				<Image config={{ image }} />
-				<Text config={titleTextConfig} />
-				<Text config={noteTextConfig} />
+				<Image {image} />
+				<Text {...titleTextConfig} />
+				<Text {...noteTextConfig} />
+				{#each dayOfftextConfigs as dayOffTextConfig, idx}
+					<Text {...dayOffTextConfig} rotation={-10} />
+				{/each}
 				{#each textConfigs as textConfig, idx}
 					{#if daysToggle[idx]}
-						<Text config={textConfig} />
+						<Text {...textConfig} />
 					{/if}
 				{/each}
 				{#each constantTextConfigs as textConfig, idx}
-					<Text config={textConfig} />
+					<Text {...textConfig} />
 				{/each}
 			</Layer>
 		</Stage>
@@ -400,28 +454,18 @@
 {/if}
 
 <div class="wrap2">
-	<Stage config={{ width: 400, height: 550 }} bind:handle={layerSmall}>
+	<Stage width={400} height={550} bind:this={stageSmall}>
 		<Layer>
-			<Image config={{ image, x: -700, y: -50 }} />
-			<Text config={titleSmallTextConfig} />
+			<Image {image} x={-700} y={-50} />
+			<Text {...titleSmallTextConfig} />
 			{#each smallTextConfigsConst as textConfig, idx}
-				<Text config={textConfig} />
+				<Text {...textConfig} />
 			{/each}
 			{#each smallTextConfigs as textConfig, idx}
-				<Text config={textConfig} />
+				<Text {...textConfig} />
 			{/each}
 		</Layer>
 	</Stage>
-	<!-- {#if viewGrid}
-		<div class="grid-wrap">
-			<div class="grid grid-title"></div>
-			<div class="grid grid-side"></div>
-			<div class="grid grid-column1"></div>
-			<div class="grid grid-column2"></div>
-			<div class="grid grid-weekend"></div>
-			<div class="grid grid-note"></div>
-		</div>
-	{/if} -->
 </div>
 
 <style>
@@ -431,7 +475,7 @@
 		font-weight: 400;
 		src:
 			local('Gilroy-Bold'),
-			url('/Gilroy-Bold.woff') format('woff');
+			url('$lib/Gilroy-Bold.woff') format('woff');
 	}
 
 	label {
@@ -446,7 +490,20 @@
 		:global(div) {
 			width: 300px;
 		}
+
+		button:first-of-type {
+			order: 0;
+		}
+
+		button:last-of-type {
+			order: 2;
+		}
+
+		input {
+			order: 1;
+		}
 	}
+
 	.wrap {
 		width: 1920px;
 		height: 1080px;
