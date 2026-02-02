@@ -5,20 +5,18 @@
 	import { schedulesStore } from '$lib/stores/schedule';
 	import { chunks } from '$lib/utils';
 	import { Stage, Layer, Image, Text, Transformer } from 'svelte-konva';
-	import { slotAddTexts, slotNames, slotShortAddTexts, TOTAL_SCHEDULE_ITEMS } from '$lib/constants';
+	import {
+		CANVAS_CONFIG,
+		slotAddTexts,
+		slotNames,
+		slotShortAddTexts,
+		TOTAL_SCHEDULE_ITEMS
+	} from '$lib/constants';
 
 	let stage: Stage | undefined = $state();
 	let stageSmall: Stage | undefined = $state();
 	let image: HTMLImageElement | undefined = $state(undefined);
 	let imageSmall: HTMLImageElement | undefined = $state(undefined);
-
-	const totalWidth = 1920;
-	const totalHeight = 1080;
-	const rightBorderWidth = 480;
-	const columngGap = 120;
-	const columnWidth = (totalWidth - rightBorderWidth - columngGap * 3) / 2;
-	const textLineHeight = 67;
-	const titleLineHeight = 200;
 
 	$effect(() => {
 		const img = document.createElement('img');
@@ -57,8 +55,8 @@
 		fontSize: 60,
 		x: $configStore.centerTextOffset,
 		y: 0,
-		height: titleLineHeight,
-		width: totalWidth - rightBorderWidth,
+		height: CANVAS_CONFIG.titleLineHeight,
+		width: CANVAS_CONFIG.totalWidth - CANVAS_CONFIG.rightBorderWidth,
 		align: 'center',
 		verticalAlign: 'middle'
 	});
@@ -78,10 +76,10 @@
 	const noteTextConfig = $derived({
 		...defaultTextConfig,
 		text: '* - расписание может меняться',
-		x: columngGap,
-		y: totalHeight - titleLineHeight,
-		height: titleLineHeight,
-		width: totalWidth - rightBorderWidth,
+		x: CANVAS_CONFIG.columnGap,
+		y: CANVAS_CONFIG.totalHeight - CANVAS_CONFIG.titleLineHeight,
+		height: CANVAS_CONFIG.titleLineHeight,
+		width: CANVAS_CONFIG.totalWidth - CANVAS_CONFIG.rightBorderWidth,
 		align: 'left',
 		verticalAlign: 'bottom'
 	});
@@ -93,25 +91,28 @@
 
 	const constantTextConfigs = $derived(
 		slotNames.map((el, idx) => {
-			let x = columngGap;
+			let x = CANVAS_CONFIG.columnGap;
 			if (idx >= 3) {
-				x += columnWidth + columngGap;
+				x += CANVAS_CONFIG.columnWidth + CANVAS_CONFIG.columnGap;
 			}
 			if (idx >= 6) {
-				x = columngGap + $configStore.centerTextOffset;
+				x = CANVAS_CONFIG.columnGap + $configStore.centerTextOffset;
 			}
-			let y = titleLineHeight;
+			let y = CANVAS_CONFIG.titleLineHeight;
 			if (idx >= 6) {
-				y = titleLineHeight + textLineHeight * 9;
+				y = CANVAS_CONFIG.titleLineHeight + CANVAS_CONFIG.textLineHeight * 9;
 			} else {
-				y = titleLineHeight + (idx % 3) * (textLineHeight * 3);
+				y = CANVAS_CONFIG.titleLineHeight + (idx % 3) * (CANVAS_CONFIG.textLineHeight * 3);
 			}
 			return {
 				...defaultTextConfig,
 				fontSize: 36,
 				text: el,
 				align: idx >= 6 ? 'center' : 'left',
-				width: idx >= 6 ? columnWidth * 2 + columngGap : columnWidth,
+				width:
+					idx >= 6
+						? CANVAS_CONFIG.columnWidth * 2 + CANVAS_CONFIG.columnGap
+						: CANVAS_CONFIG.columnWidth,
 				x,
 				y
 			};
@@ -120,26 +121,29 @@
 
 	const textConfigs = $derived(
 		slotNames.map((el, idx) => {
-			let x = columngGap;
+			let x = CANVAS_CONFIG.columnGap;
 			if (idx >= 6) {
-				x += columnWidth + columngGap;
+				x += CANVAS_CONFIG.columnWidth + CANVAS_CONFIG.columnGap;
 			}
 			if (idx >= 12) {
-				x = columngGap + $configStore.centerTextOffset;
+				x = CANVAS_CONFIG.columnGap + $configStore.centerTextOffset;
 			}
-			let y = titleLineHeight;
+			let y = CANVAS_CONFIG.titleLineHeight;
 			if (idx >= 12) {
-				y = titleLineHeight + textLineHeight * (10 + idx - 12);
+				y = CANVAS_CONFIG.titleLineHeight + CANVAS_CONFIG.textLineHeight * (10 + idx - 12);
 			} else {
 				const add = Math.floor((idx % 6) / 2) + 1;
-				y = titleLineHeight + ((idx % 6) + add) * textLineHeight;
+				y = CANVAS_CONFIG.titleLineHeight + ((idx % 6) + add) * CANVAS_CONFIG.textLineHeight;
 			}
 			return {
 				...defaultTextConfig,
 				fill: $configStore.textColor,
 				text: slotAddTexts[idx] + $schedulesStore[idx].text,
 				align: idx >= 12 ? 'center' : 'left',
-				width: idx >= 12 ? columnWidth * 2 + columngGap : columnWidth,
+				width:
+					idx >= 12
+						? CANVAS_CONFIG.columnWidth * 2 + CANVAS_CONFIG.columnGap
+						: CANVAS_CONFIG.columnWidth,
 				x,
 				y
 			};
@@ -149,18 +153,18 @@
 	const dayOfftextConfigs = $derived(
 		daysOff
 			.map((el, idx) => {
-				let x = columngGap - 40;
+				let x = CANVAS_CONFIG.columnGap - 40;
 				if (idx >= 3) {
-					x += columnWidth + columngGap;
+					x += CANVAS_CONFIG.columnWidth + CANVAS_CONFIG.columnGap;
 				}
 				if (idx >= 6) {
-					x = columngGap + $configStore.centerTextOffset;
+					x = CANVAS_CONFIG.columnGap + $configStore.centerTextOffset;
 				}
-				let y = titleLineHeight;
+				let y = CANVAS_CONFIG.titleLineHeight;
 				if (idx >= 6) {
-					y = titleLineHeight + (3 * 3 + 2) * textLineHeight;
+					y = CANVAS_CONFIG.titleLineHeight + (3 * 3 + 2) * CANVAS_CONFIG.textLineHeight;
 				} else {
-					y = titleLineHeight + ((idx % 3) * 3 + 1) * textLineHeight;
+					y = CANVAS_CONFIG.titleLineHeight + ((idx % 3) * 3 + 1) * CANVAS_CONFIG.textLineHeight;
 				}
 				return {
 					...defaultTextConfig,
@@ -169,8 +173,11 @@
 					fontSize: 50,
 					align: 'center',
 					verticalAlign: 'middle',
-					height: textLineHeight * 2 + 30,
-					width: idx >= 6 ? columnWidth * 2 + columngGap : columnWidth,
+					height: CANVAS_CONFIG.textLineHeight * 2 + 30,
+					width:
+						idx >= 6
+							? CANVAS_CONFIG.columnWidth * 2 + CANVAS_CONFIG.columnGap
+							: CANVAS_CONFIG.columnWidth,
 					x,
 					y
 				};
@@ -262,7 +269,7 @@
 
 	{#if $configStore.viewCanvas}
 		<div class="wrap">
-			<Stage width={totalWidth} height={totalHeight} bind:this={stage}>
+			<Stage width={CANVAS_CONFIG.totalWidth} height={CANVAS_CONFIG.totalHeight} bind:this={stage}>
 				<Layer>
 					<Image {image} />
 					<Text {...titleTextConfig} />

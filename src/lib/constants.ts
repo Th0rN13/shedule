@@ -5,7 +5,7 @@ export const CANVAS_CONFIG = {
     totalHeight: 1080,
     rightBorderWidth: 480,
     columnGap: 120,
-    columnWidth: 660,
+    columnWidth: (1920 - 480 - 120 * 3) / 2, // (totalWidth - rightBorderWidth - columnGap * 3) / 2
     textLineHeight: 67,
     titleLineHeight: 200
 };
