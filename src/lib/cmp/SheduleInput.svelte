@@ -17,6 +17,11 @@
 	function toggle() {
 		schedulesStore.updateToggle(idx);
 	}
+
+	function clear() {
+		text = '';
+		change();
+	}
 </script>
 
 <label class="schedule-item">
@@ -37,6 +42,6 @@
 				❌
 			{/if}
 		</button>
-		<button class="icon-btn delete" title="Очистить">🗑️</button>
+		<button class="icon-btn delete" title="Очистить" onclick={clear}>🗑️</button>
 	</div>
 </label>
