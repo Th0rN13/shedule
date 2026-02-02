@@ -85,7 +85,7 @@
 		...defaultTextConfig,
 		text: '*Расписание',
 		fontSize: 60,
-		x: $configStore.titleOffset,
+		x: $configStore.centerTextOffset,
 		y: 0,
 		height: titleLineHeight,
 		width: totalWidth - rightBorderWidth,
@@ -128,7 +128,7 @@
 				x += columnWidth + columngGap;
 			}
 			if (idx >= 6) {
-				x = columngGap + $configStore.titleOffset;
+				x = columngGap + $configStore.centerTextOffset;
 			}
 			let y = titleLineHeight;
 			if (idx >= 6) {
@@ -155,7 +155,7 @@
 				x += columnWidth + columngGap;
 			}
 			if (idx >= 12) {
-				x = columngGap + $configStore.titleOffset;
+				x = columngGap + $configStore.centerTextOffset;
 			}
 			let y = titleLineHeight;
 			if (idx >= 12) {
@@ -184,7 +184,7 @@
 					x += columnWidth + columngGap;
 				}
 				if (idx >= 6) {
-					x = columngGap + $configStore.titleOffset;
+					x = columngGap + $configStore.centerTextOffset;
 				}
 				let y = titleLineHeight;
 				if (idx >= 6) {
@@ -319,16 +319,6 @@
 				</label>
 			{/each}
 		</div> -->
-	<!-- 
-		<label>
-			<span> Цвет текста </span>
-			<input type="color" name="color" bind:value={$configStore.textColor} />
-		</label>
-
-		<label>
-			<span> Сдвиг центрального текста </span>
-			<RangeSlider bind:value={$configStore.titleOffset} min={-400} max={100} float></RangeSlider>
-		</label> -->
 
 	{#if $configStore.viewCanvas}
 		<div class="wrap">

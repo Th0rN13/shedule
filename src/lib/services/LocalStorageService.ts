@@ -4,7 +4,7 @@ import type { HexColor, ScheduleItem } from "$lib/types";
 export interface LocalStorageData {
     slots: Array<ScheduleItem>,
     textColor: HexColor;
-    titleOffset: number;
+    centerTextOffset: number;
 };
 
 function updateLocalStorage<T extends LocalStorageData>(
@@ -40,7 +40,7 @@ export class LocalStorageService {
 
         let result: LocalStorageData = {
             slots: Array.from({ length: TOTAL_SCHEDULE_ITEMS }).map(() => ({ text: '', enabled: true })),
-            titleOffset: 0,
+            centerTextOffset: 0,
             textColor: '#000000'
         };
         try {

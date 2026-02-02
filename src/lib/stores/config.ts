@@ -7,7 +7,7 @@ interface UIState {
     viewGrid: boolean;
     viewPreviewModal: boolean;
     textColor: HexColor;
-    titleOffset: number;
+    centerTextOffset: number;
 }
 
 function createStore() {
@@ -17,7 +17,7 @@ function createStore() {
         viewGrid: false,
         viewPreviewModal: false,
         textColor: data.textColor,
-        titleOffset: data.titleOffset,
+        centerTextOffset: data.centerTextOffset,
     });
 
     return {
@@ -33,9 +33,9 @@ function createStore() {
             LocalStorageService.update({ textColor: color });
             return { ...state, textColor: color }
         }),
-        setTitleOffset: (offset: number) => update(state => {
-            LocalStorageService.update({ titleOffset: offset });
-            return { ...state, titleOffset: offset }
+        setcenterTextOffset: (offset: number) => update(state => {
+            LocalStorageService.update({ centerTextOffset: offset });
+            return { ...state, centerTextOffset: offset }
         })
     };
 }
