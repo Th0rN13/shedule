@@ -14,3 +14,12 @@
 		{/each}
 	</div>
 </Section>
+
+<style>
+	.schedule-list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 8px;
+		overflow: hidden;
+	}
+</style>
