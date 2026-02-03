@@ -73,6 +73,6 @@
 	:global(.konvajs-content) {
 		height: unset !important;
 		max-width: calc(90vw - 900px);
-		max-height: 600px;
+		max-height: calc(90vh);
 	}
 </style>
