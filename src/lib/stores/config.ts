@@ -33,7 +33,7 @@ function createStore() {
             LocalStorageService.update({ textColor: color });
             return { ...state, textColor: color }
         }),
-        setcenterTextOffset: (offset: number) => update(state => {
+        setCenterTextOffset: (offset: number) => update(state => {
             LocalStorageService.update({ centerTextOffset: offset });
             return { ...state, centerTextOffset: offset }
         })

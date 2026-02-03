@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { dayOrders } from '$lib/constants';
 	import { schedulesStore } from '$lib/stores/schedule';
-	import SheduleInput from './SheduleInput.svelte';
+	import ScheduleInput from './ScheduleInput.svelte';
 
 	let text = $state('');
 	let enabled = $state(true);
@@ -17,13 +17,13 @@
 
 <div class="schedule-day" style="order: {dayOrders[dayIdx]};">
 	<div class="schedule-day-title">{day}</div>
-	<SheduleInput
+	<ScheduleInput
 		label={'Утро'}
 		text={$schedulesStore[dayIdx * 2].text}
 		enabled={$schedulesStore[dayIdx * 2].enabled}
 		idx={dayIdx * 2}
 	/>
-	<SheduleInput
+	<ScheduleInput
 		label={'Вечер'}
 		text={$schedulesStore[dayIdx * 2 + 1].text}
 		enabled={$schedulesStore[dayIdx * 2 + 1].enabled}

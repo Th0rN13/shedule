@@ -25,7 +25,7 @@
 
 	const titleTextConfig = $derived(CanvasService.generateTitleConfig($configStore));
 	const footNoteTextConfig = $derived(CanvasService.generateFootNoteConfig($configStore));
-	const dayTextConfigs = $derived(CanvasService.generatDayTextConfigs($configStore));
+	const dayTextConfigs = $derived(CanvasService.generateDayTextConfigs($configStore));
 	const slotConfigs = $derived(CanvasService.generatSlotTextConfigs($schedulesStore, $configStore));
 	const daysOffConfigs = $derived(
 		CanvasService.generatDaysOffTextConfigs($schedulesStore, $configStore)

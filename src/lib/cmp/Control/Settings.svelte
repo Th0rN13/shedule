@@ -21,8 +21,8 @@
 		configStore.setColor(currentColor);
 	}
 
-	function setcenterTextOffset() {
-		configStore.setcenterTextOffset(centerTextOffset);
+	function setCenterTextOffset() {
+		configStore.setCenterTextOffset(centerTextOffset);
 	}
 </script>
 
@@ -36,7 +36,7 @@
 			min={-400}
 			max={100}
 			float
-			on:change={setcenterTextOffset}
+			on:change={setCenterTextOffset}
 		></RangeSlider>
 	</ControlGroup>
 	<ButtonGroup>

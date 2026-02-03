@@ -106,7 +106,7 @@ export class CanvasService {
     }
 
     // Large Canvas days of week labels
-    static generatDayTextConfigs(configState: ConfigState): TextConfig[] {
+    static generateDayTextConfigs(configState: ConfigState): TextConfig[] {
         let positions = this.getDayTextPositions(configState);
         return dayTexts.map((text, idx) => {
             return {
