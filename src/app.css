@@ -114,10 +114,10 @@ body {
 }
 
 .schedule-item {
-	background: var(--surface);
+	/* background: var(--surface);
 	border: 1px solid var(--border);
-	border-radius: var(--radius);
-	padding: 8px;
+	border-radius: var(--radius); */
+	padding: 4px 0px;
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -135,7 +135,7 @@ body {
 }
 
 .schedule-label {
-	min-width: 110px;
+	min-width: 50px;
 	font-size: 12px;
 	font-weight: 500;
 	color: var(--text-primary);

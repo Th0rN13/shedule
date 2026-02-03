@@ -1,12 +1,6 @@
 <script lang="ts">
-	import { slotNames } from '$lib/constants';
-	import { schedulesStore } from '$lib/stores/schedule';
 	import Control from './Control.svelte';
-	import SheduleInput from './SheduleInput.svelte';
-
-	interface PropType {}
-
-	let {}: PropType = $props();
+	import ScheduleTable from './ScheduleTable.svelte';
 </script>
 
 <!-- Sidebar -->
@@ -17,15 +11,7 @@
 	</div>
 
 	<div class="sidebar-content">
-		<!-- Schedule Entries -->
-		<div class="section schedule-section">
-			<h2 class="section-title">Временные слоты</h2>
-			<div class="schedule-list" id="scheduleList">
-				{#each $schedulesStore as { text, enabled }, idx}
-					<SheduleInput label={slotNames[idx]} {text} {enabled} {idx} />
-				{/each}
-			</div>
-		</div>
+		<ScheduleTable />
 
 		<Control />
 	</div>

@@ -14,7 +14,7 @@
 <main class="preview-area">
 	<div class="preview-header">
 		<h2>Предпросмотр расписания</h2>
-		<button class="btn btn-secondary" id="showPreviewModal">
+		<button class="btn btn-secondary">
 			<span class="icon">🖼️</span>
 			Посмотреть полный размер
 		</button>

@@ -34,6 +34,7 @@ export const slotNames = [
     'Воскресенье, 10:00',
     'Воскресенье, 19:00'
 ];
+
 export const slotAddTexts = [
     '9:00 - ',
     '19:00 - ',
@@ -50,6 +51,7 @@ export const slotAddTexts = [
     '10:00 - ',
     '19:00 - '
 ];
+
 export const dayTexts = [
     'Понедельник',
     'Вторник',
@@ -59,6 +61,9 @@ export const dayTexts = [
     'Суббота',
     'Воскресенье'
 ];
+
+export const dayOrders = [0, 2, 4, 1, 3, 5, 6];
+
 export const slotShortAddTexts = [
     'Пн 09:00',
     'Пн 19:00',
