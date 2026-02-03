@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { schedulesStore } from '$lib/stores/schedule';
+	import IconButton from './UI/IconButton.svelte';
 
 	interface PropType {
 		label: string;
@@ -35,13 +36,7 @@
 		onchange={change}
 	/>
 	<div class="schedule-actions">
-		<button class="icon-btn save" title="Переключить" onclick={toggle}>
-			{#if enabled}
-				✅
-			{:else}
-				❌
-			{/if}
-		</button>
-		<button class="icon-btn delete" title="Очистить" onclick={clear}>🗑️</button>
+		<IconButton label={enabled ? '✅' : '❌'} title="Переключить" onclick={toggle} />
+		<IconButton label="🗑️" title="Очистить" onclick={clear} />
 	</div>
 </label>
