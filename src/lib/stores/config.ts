@@ -5,7 +5,7 @@ import { writable } from 'svelte/store';
 export interface ConfigState {
     viewCanvas: boolean;
     viewGrid: boolean;
-    viewPreviewModal: boolean;
+    viewModal: boolean;
     textColor: HexColor;
     centerTextOffset: number;
 }
@@ -15,7 +15,7 @@ function createStore() {
     const { subscribe, set, update } = writable<ConfigState>({
         viewCanvas: true,
         viewGrid: false,
-        viewPreviewModal: false,
+        viewModal: false,
         textColor: data.textColor,
         centerTextOffset: data.centerTextOffset,
     });
@@ -28,7 +28,7 @@ function createStore() {
         toggleGrid: () => update(state => {
             return { ...state, viewGrid: !state.viewGrid }
         }),
-        toggleModal: () => update(state => ({ ...state, viewPreviewModal: !state.viewPreviewModal })),
+        toggleModal: () => update(state => ({ ...state, viewModal: !state.viewModal })),
         setColor: (color: HexColor) => update(state => {
             LocalStorageService.update({ textColor: color });
             return { ...state, textColor: color }

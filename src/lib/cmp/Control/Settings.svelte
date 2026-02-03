@@ -9,8 +9,8 @@
 	let currentColor = $state($configStore.textColor);
 	let centerTextOffset = $state($configStore.centerTextOffset);
 
-	function toggleCanvas() {
-		configStore.toggleCanvas();
+	function toggleModal() {
+		configStore.toggleModal();
 	}
 
 	function toggleGrid() {
@@ -40,7 +40,7 @@
 		></RangeSlider>
 	</ControlGroup>
 	<ButtonGroup>
-		<Button onclick={toggleCanvas} icon="picture" label="Увеличить" />
+		<Button onclick={toggleModal} icon="picture" label="Увеличить" />
 		<Button onclick={toggleGrid} icon="grid" label="Сетка" />
 	</ButtonGroup>
 </Section>

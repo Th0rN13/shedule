@@ -7,7 +7,8 @@
 		switch: '⇄',
 		download: '⬇️',
 		grid: '📐',
-		picture: '🖼️'
+		picture: '🖼️',
+		close: '✕'
 	};
 
 	let { label }: PropType = $props();
