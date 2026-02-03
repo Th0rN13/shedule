@@ -2,7 +2,7 @@ import { LocalStorageService } from '$lib/services/LocalStorageService';
 import type { HexColor } from '$lib/types';
 import { writable } from 'svelte/store';
 
-interface UIState {
+export interface ConfigState {
     viewCanvas: boolean;
     viewGrid: boolean;
     viewPreviewModal: boolean;
@@ -12,7 +12,7 @@ interface UIState {
 
 function createStore() {
     let data = LocalStorageService.load();
-    const { subscribe, set, update } = writable<UIState>({
+    const { subscribe, set, update } = writable<ConfigState>({
         viewCanvas: true,
         viewGrid: false,
         viewPreviewModal: false,

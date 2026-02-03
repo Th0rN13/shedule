@@ -18,6 +18,13 @@ export const TEXT_CONFIGS = {
     fontFamily: 'Gilroy-Bold'
 };
 
+export const LABEL_TEXTS = {
+    title: 'Расписание',
+    dayOff: '✨ ВЫХОДНОЙ',
+    footNote: '* - расписание может меняться',
+
+}
+
 export const slotNames = [
     'Понедельник, 9:00',
     'Понедельник, 19:00',

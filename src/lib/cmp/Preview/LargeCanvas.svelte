@@ -3,9 +3,9 @@
 	import { CANVAS_CONFIG, dayTexts, slotAddTexts, slotNames } from '$lib/constants';
 	import { configStore } from '$lib/stores/config';
 	import { schedulesStore } from '$lib/stores/schedule';
-	import { chunks } from '$lib/utils';
 	import { Stage, Layer, Image, Text } from 'svelte-konva';
 	import { stageStore } from '$lib/stores/stage';
+	import { CanvasService } from '$lib/services/CanvasService';
 
 	let stage: Stage | undefined = $state();
 	let image: HTMLImageElement | undefined = $state(undefined);
@@ -14,9 +14,6 @@
 		if (stage) {
 			stageStore.updateLarge(stage);
 		}
-	});
-
-	$effect(() => {
 		const img = document.createElement('img');
 		img.src = background;
 		img.crossOrigin = 'Anonymous';
@@ -25,141 +22,12 @@
 		};
 	});
 
-	const defaultTextConfig = $derived({
-		fontSize: 30,
-		padding: 0,
-		fontFamily: 'Gilroy-Bold',
-		fill: $configStore.textColor,
-		shadowColor: 'white',
-		shadowBlur: 10,
-		shadowOpacity: 1,
-		shadowEnabled: true,
-		wrap: 'none',
-		ellipsis: true
-	});
-
-	const titleTextConfig = $derived({
-		...defaultTextConfig,
-		text: '*Расписание',
-		fontSize: 60,
-		x: $configStore.centerTextOffset,
-		y: 0,
-		height: CANVAS_CONFIG.titleLineHeight,
-		width: CANVAS_CONFIG.totalWidth - CANVAS_CONFIG.rightBorderWidth,
-		align: 'center',
-		verticalAlign: 'middle'
-	});
-
-	const noteTextConfig = $derived({
-		...defaultTextConfig,
-		text: '* - расписание может меняться',
-		x: CANVAS_CONFIG.columnGap,
-		y: CANVAS_CONFIG.totalHeight - CANVAS_CONFIG.titleLineHeight,
-		height: CANVAS_CONFIG.titleLineHeight,
-		width: CANVAS_CONFIG.totalWidth - CANVAS_CONFIG.rightBorderWidth,
-		align: 'left',
-		verticalAlign: 'bottom'
-	});
-
-	const daysOff = $derived.by(() => {
-		let result = [...chunks($schedulesStore, 2)].map((day) => day.every((slot) => !slot.enabled));
-		return result;
-	});
-
-	const dayOfftextConfigs = $derived(
-		daysOff
-			.map((el, idx) => {
-				let x = CANVAS_CONFIG.columnGap - 40;
-				if (idx >= 3) {
-					x += CANVAS_CONFIG.columnWidth + CANVAS_CONFIG.columnGap;
-				}
-				if (idx >= 6) {
-					x = CANVAS_CONFIG.columnGap + $configStore.centerTextOffset;
-				}
-				let y = CANVAS_CONFIG.titleLineHeight;
-				if (idx >= 6) {
-					y = CANVAS_CONFIG.titleLineHeight + (3 * 3 + 2) * CANVAS_CONFIG.textLineHeight;
-				} else {
-					y = CANVAS_CONFIG.titleLineHeight + ((idx % 3) * 3 + 1) * CANVAS_CONFIG.textLineHeight;
-				}
-				return {
-					...defaultTextConfig,
-					fill: $configStore.textColor,
-					text: el ? '✨ ВЫХОДНОЙ' : '',
-					fontSize: 50,
-					align: 'center',
-					verticalAlign: 'middle',
-					height: CANVAS_CONFIG.textLineHeight * 2 + 30,
-					width:
-						idx >= 6
-							? CANVAS_CONFIG.columnWidth * 2 + CANVAS_CONFIG.columnGap
-							: CANVAS_CONFIG.columnWidth,
-					x,
-					y
-				};
-			})
-			.filter((el) => el.text !== '')
-	);
-
-	const textConfigs = $derived(
-		slotNames.map((el, idx) => {
-			let x = CANVAS_CONFIG.columnGap;
-			if (idx >= 6) {
-				x += CANVAS_CONFIG.columnWidth + CANVAS_CONFIG.columnGap;
-			}
-			if (idx >= 12) {
-				x = CANVAS_CONFIG.columnGap + $configStore.centerTextOffset;
-			}
-			let y = CANVAS_CONFIG.titleLineHeight;
-			if (idx >= 12) {
-				y = CANVAS_CONFIG.titleLineHeight + CANVAS_CONFIG.textLineHeight * (10 + idx - 12);
-			} else {
-				const add = Math.floor((idx % 6) / 2) + 1;
-				y = CANVAS_CONFIG.titleLineHeight + ((idx % 6) + add) * CANVAS_CONFIG.textLineHeight;
-			}
-			return {
-				...defaultTextConfig,
-				fill: $configStore.textColor,
-				text: slotAddTexts[idx] + $schedulesStore[idx].text,
-				align: idx >= 12 ? 'center' : 'left',
-				width:
-					idx >= 12
-						? CANVAS_CONFIG.columnWidth * 2 + CANVAS_CONFIG.columnGap
-						: CANVAS_CONFIG.columnWidth,
-				x,
-				y
-			};
-		})
-	);
-
-	const slotTextConfigs = $derived(
-		dayTexts.map((el, idx) => {
-			let x = CANVAS_CONFIG.columnGap;
-			if (idx >= 3) {
-				x += CANVAS_CONFIG.columnWidth + CANVAS_CONFIG.columnGap;
-			}
-			if (idx >= 6) {
-				x = CANVAS_CONFIG.columnGap + $configStore.centerTextOffset;
-			}
-			let y = CANVAS_CONFIG.titleLineHeight;
-			if (idx >= 6) {
-				y = CANVAS_CONFIG.titleLineHeight + CANVAS_CONFIG.textLineHeight * 9;
-			} else {
-				y = CANVAS_CONFIG.titleLineHeight + (idx % 3) * (CANVAS_CONFIG.textLineHeight * 3);
-			}
-			return {
-				...defaultTextConfig,
-				fontSize: 36,
-				text: el,
-				align: idx >= 6 ? 'center' : 'left',
-				width:
-					idx >= 6
-						? CANVAS_CONFIG.columnWidth * 2 + CANVAS_CONFIG.columnGap
-						: CANVAS_CONFIG.columnWidth,
-				x,
-				y
-			};
-		})
+	const titleTextConfig = $derived(CanvasService.generateTitleConfig($configStore));
+	const footNoteTextConfig = $derived(CanvasService.generateFootNoteConfig($configStore));
+	const dayTextConfigs = $derived(CanvasService.generatDayTextConfigs($configStore));
+	const slotConfigs = $derived(CanvasService.generatSlotTextConfigs($schedulesStore, $configStore));
+	const daysOffConfigs = $derived(
+		CanvasService.generatDaysOffTextConfigs($schedulesStore, $configStore)
 	);
 </script>
 
@@ -168,17 +36,16 @@
 		<Layer>
 			<Image {image} />
 			<Text {...titleTextConfig} />
-			<Text {...noteTextConfig} />
-			{#each dayOfftextConfigs as dayOffTextConfig, idx}
-				<Text {...dayOffTextConfig} rotation={-10} />
-			{/each}
-			{#each textConfigs as textConfig, idx}
-				{#if $schedulesStore[idx].enabled}
-					<Text {...textConfig} />
-				{/if}
-			{/each}
-			{#each slotTextConfigs as textConfig, idx}
+			<Text {...footNoteTextConfig} />
+			{#each dayTextConfigs as textConfig, idx}
 				<Text {...textConfig} />
+			{/each}
+			{#each slotConfigs as textConfig, idx}
+				<Text {...textConfig} />
+			{/each}
+
+			{#each daysOffConfigs as dayOffTextConfig, idx}
+				<Text {...dayOffTextConfig} rotation={-10} />
 			{/each}
 		</Layer>
 	</Stage>
